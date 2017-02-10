@@ -1,0 +1,14 @@
+[Unit]
+Description=DCM4CHEE container
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker run --name=dcm4chee -p 8080:8080 -p 11112:11112 dcm4chee
+ExecStop=/usr/bin/docker stop -t 2 dcm4chee
+ExecStopPost=/usr/bin/docker rm -f dcm4chee
+
+[Install]
+WantedBy=default.target
+
