@@ -12,6 +12,7 @@ ExecStart=/usr/bin/docker run --hostname=dcm4chee.%H --network=dcm4chee_default 
 	-p 9990:9990 \
 	-p 11112:11112 \
 	-p 2575:2575 \
+	-e POSTGRES_HOST=${POSTGRES_HOST} \
 	-e POSTGRES_DB=${POSTGRES_DB} \
 	-e POSTGRES_USER=${POSTGRES_USER} \
 	-e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \

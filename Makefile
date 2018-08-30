@@ -1,10 +1,10 @@
 VERSION = 5.14.0
-RELEASE = 5
+RELEASE = 6
 
 DCM4CHEE_VERSION = 5.14.0-secure
 DCM4CHE_VERSION = 5.14.0
-KEYCLOAK_VERSION = 4.0.0-13.3
-LDAP_VERSION = 2.4.44-13.3
+KEYCLOAK_VERSION = 4.3.0-14.0
+LDAP_VERSION = 2.4.44-14.0
 
 rpm: dcm4chee.spec.in docker-dcm4chee.service docker-keycloak.service docker-ldap.service keycloak.conf ldap.conf dcm4chee.conf
 	-rm -rf /tmp/dcm4chee-$(VERSION)
