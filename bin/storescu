@@ -1,0 +1,8 @@
+#!/bin/bash
+
+. /etc/dcm4chee/dcm4che.conf
+
+ARGS="$@"
+docker run --name=storescu -e TZ=${TZ} -e LANG=${LANG} -v /etc/localtime:/etc/localtime:ro -v ${STORAGE_DIR}:${STORAGE_DIR}:rw -it openmedicus/dcm4che-tools:@DCM4CHE_VERSION@ /bin/bash -c "storescu $ARGS"
+docker rm storescu > /dev/null
+

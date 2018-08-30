@@ -26,6 +26,13 @@ Group:          System Environment/Base
 %description keycloak
 Keycloak configuration files for DCM4CHEE Docker version
 
+%package        tools
+Summary:        Tools configuration files for DCM4CHEE Docker version
+Group:          System Environment/Base
+
+%description tools
+Tools configuration files for DCM4CHEE Docker version
+
 %prep
 %setup -q
 
@@ -79,6 +86,10 @@ mkdir -p %{buildroot}/docker/dcm4chee/wildfly
 mkdir -p %{buildroot}/usr/share/dcm4chee/psql
 cp sql/*.sql %{buildroot}/usr/share/dcm4chee/psql/
 
+cp dcm4che.conf %{buildroot}/etc/dcm4chee/
+mkdir -p %{buildroot}/usr/bin
+cp bin/* %{buildroot}/usr/bin/
+
 %clean
 rm -rf %{buildroot}
 
@@ -105,6 +116,10 @@ rm -rf %{buildroot}
 %config (noreplace) /etc/dcm4chee/keycloak.conf
 %attr(-, keycloak-dcm4chee, keycloak-dcm4chee) %dir /docker/dcm4chee/keycloak
 
+%files tools
+%defattr(-,root,root)
+%config (noreplace) /etc/dcm4chee/dcm4che.conf
+%attr(755,root,root) /usr/bin/*
 
 
 %changelog

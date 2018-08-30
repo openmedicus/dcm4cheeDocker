@@ -1,7 +1,8 @@
 VERSION = 5.14.0
-RELEASE = 4
+RELEASE = 5
 
 DCM4CHEE_VERSION = 5.14.0-secure
+DCM4CHE_VERSION = 5.14.0
 KEYCLOAK_VERSION = 4.0.0-13.3
 LDAP_VERSION = 2.4.44-13.3
 
@@ -24,6 +25,10 @@ rpm: dcm4chee.spec.in docker-dcm4chee.service docker-keycloak.service docker-lda
 	mkdir /tmp/dcm4chee-$(VERSION)/sql
 	cp dcm4chee-arc-light/dcm4chee-arc-entity/src/main/resources/sql/create-sqlserver.sql /tmp/dcm4chee-$(VERSION)/sql/create-psql.sql
 	cp dcm4chee-arc-light/dcm4chee-arc-entity/src/main/resources/sql/update-*-psql.sql /tmp/dcm4chee-$(VERSION)/sql/
+	cp dcm4che.conf /tmp/dcm4chee-$(VERSION)/
+	mkdir /tmp/dcm4chee-$(VERSION)/bin
+	cp bin/* /tmp/dcm4chee-$(VERSION)/bin/
+	sed -i -e 's!@DCM4CHE_VERSION@!$(DCM4CHE_VERSION)!g' /tmp/dcm4chee-$(VERSION)/bin/*
 	cd /tmp && tar cfz dcm4chee-$(VERSION).tar.gz dcm4chee-$(VERSION) && cd -
 	cd /tmp && rpmbuild -ta /tmp/dcm4chee-$(VERSION).tar.gz
 
