@@ -1,22 +1,29 @@
-VERSION = 2.18.3
+VERSION = 5.14.0
+RELEASE = 4
 
-all: pull build tag push
+DCM4CHEE_VERSION = 5.14.0-secure
+KEYCLOAK_VERSION = 4.0.0-13.3
+LDAP_VERSION = 2.4.44-13.3
 
-pull:
-	sudo docker pull centos:7
+rpm: dcm4chee.spec.in docker-dcm4chee.service docker-keycloak.service docker-ldap.service keycloak.conf ldap.conf dcm4chee.conf
+	-rm -rf /tmp/dcm4chee-$(VERSION)
+	-rm -f /tmp/dcm4chee-$(VERSION).tar.gz
+	mkdir /tmp/dcm4chee-$(VERSION)
+	cp dcm4chee.spec.in /tmp/dcm4chee-$(VERSION)/dcm4chee.spec
+	sed -i -e 's!@VERSION@!$(VERSION)!g' /tmp/dcm4chee-$(VERSION)/dcm4chee.spec
+	sed -i -e 's!@RELEASE@!$(RELEASE)!g' /tmp/dcm4chee-$(VERSION)/dcm4chee.spec
+	cp docker-dcm4chee.service /tmp/dcm4chee-$(VERSION)/
+	sed -i -e 's!@DOCKER_VERSION@!$(DCM4CHEE_VERSION)!g' /tmp/dcm4chee-$(VERSION)/docker-dcm4chee.service
+	cp docker-keycloak.service /tmp/dcm4chee-$(VERSION)/
+	sed -i -e 's!@DOCKER_VERSION@!$(KEYCLOAK_VERSION)!g' /tmp/dcm4chee-$(VERSION)/docker-keycloak.service
+	cp docker-ldap.service /tmp/dcm4chee-$(VERSION)/
+	sed -i -e 's!@DOCKER_VERSION@!$(LDAP_VERSION)!g' /tmp/dcm4chee-$(VERSION)/docker-ldap.service
+	cp dcm4chee.conf /tmp/dcm4chee-$(VERSION)/
+	cp ldap.conf /tmp/dcm4chee-$(VERSION)/
+	cp keycloak.conf /tmp/dcm4chee-$(VERSION)/
+	mkdir /tmp/dcm4chee-$(VERSION)/sql
+	cp dcm4chee-arc-light/dcm4chee-arc-entity/src/main/resources/sql/create-sqlserver.sql /tmp/dcm4chee-$(VERSION)/sql/create-psql.sql
+	cp dcm4chee-arc-light/dcm4chee-arc-entity/src/main/resources/sql/update-*-psql.sql /tmp/dcm4chee-$(VERSION)/sql/
+	cd /tmp && tar cfz dcm4chee-$(VERSION).tar.gz dcm4chee-$(VERSION) && cd -
+	cd /tmp && rpmbuild -ta /tmp/dcm4chee-$(VERSION).tar.gz
 
-build:
-	sudo docker build -t dcm4chee .
-
-push:
-	sudo docker tag dcm4chee openmedicus/dcm4chee:$(VERSION)
-	sudo docker push openmedicus/dcm4chee
-	sudo docker tag dcm4chee openmedicus/dcm4chee:latest
-	sudo docker push openmedicus/dcm4chee
-
-run:
-	sudo docker run -i -t dcm4chee /bin/bash
-
-download:
-	firefox http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
-	wget -O - http://sourceforge.net/projects/dcm4che/files/dcm4chee/$(VERSION)/dcm4chee-$(VERSION)-psql.zip/download > dcm4chee-$(VERSION)-psql.zip

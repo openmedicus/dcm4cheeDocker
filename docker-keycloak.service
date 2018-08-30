@@ -1,0 +1,25 @@
+[Unit]
+Description=Keycloak Container
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+EnvironmentFile=/etc/dcm4chee/keycloak.conf
+ExecStart=/usr/bin/docker run --hostname=dcm4chee.%H --network=dcm4chee_default --name keycloak -e TZ=${TZ} -e LC_ALL=${LOCALE} -e LANG=${LANG} \
+	-p 8880:8880 \
+	-p 8843:8843 \
+	-p 8990:8990 \
+	-e HTTP_PORT=8880 \
+	-e HTTPS_PORT=8843 \
+	-e MANAGEMENT_HTTP_PORT=8990 \
+	-e KEYCLOAK_WAIT_FOR=ldap:389 \
+	-v /etc/localtime:/etc/localtime:ro \
+	-v /docker/dcm4chee/keycloak:/opt/keycloak/standalone \
+	dcm4che/keycloak:@DOCKER_VERSION@
+ExecStop=/usr/bin/docker stop -t 2 keycloak
+ExecStopPost=/usr/bin/docker rm -f keycloak
+
+[Install]
+WantedBy=default.target
+

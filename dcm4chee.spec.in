@@ -1,0 +1,111 @@
+Name:           dcm4chee
+License:        GPL
+Group:          System Environment/Base 
+Version:        @VERSION@
+Release:        @RELEASE@%{?dist}
+Url:		https://github.com/dcm4che/dcm4chee-arc-light/wiki/Run-secured-archive-services-on-a-single-host
+Summary:        DCM4CHEE configuration files for Docker version
+Source0:	dcm4chee-@VERSION@.tar.gz
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+BuildArch:      noarch
+
+%description
+DCM4CHEE configuration files for Docker version
+
+%package        ldap
+Summary:        LDAP configuration files for DCM4CHEE Docker version
+Group:          System Environment/Base
+
+%description ldap
+LDAP configuration files for DCM4CHEE Docker version
+
+%package        keycloak
+Summary:        Keycloak configuration files for DCM4CHEE Docker version
+Group:          System Environment/Base
+
+%description keycloak
+Keycloak configuration files for DCM4CHEE Docker version
+
+%prep
+%setup -q
+
+%pre
+getent group dcm4chee-arc >/dev/null || groupadd -r dcm4chee-arc --gid=1023
+getent passwd dcm4chee-arc >/dev/null || useradd -r -g dcm4chee-arc --uid=1023 -d /docker/dcm4chee -s /sbin/nologin dcm4chee-arc
+exit 0
+
+%pre ldap
+getent group slapd-dcm4chee >/dev/null || groupadd -r slapd-dcm4chee --gid=1021
+getent passwd slapd-dcm4chee >/dev/null || useradd -r -g slapd-dcm4chee --uid=1021 -d /docker/dcm4chee -s /sbin/nologin slapd-dcm4chee
+exit 0
+
+%pre keycloak
+getent group keycloak-dcm4chee >/dev/null || groupadd -r keycloak-dcm4chee --gid=1029 
+getent passwd keycloak-dcm4chee >/dev/null || useradd -r -g keycloak-dcm4chee --uid=1029 -d /docker/dcm4chee -s /sbin/nologin keycloak-dcm4chee
+exit 0
+
+%post
+/usr/bin/systemctl daemon-reload >/dev/null 2>&1
+chcon system_u:object_r:container_file_t:s0 /storage
+
+%post ldap
+/usr/bin/systemctl daemon-reload >/dev/null 2>&1 
+
+%post keycloak
+/usr/bin/systemctl daemon-reload >/dev/null 2>&1 
+
+
+%build
+
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}/etc/systemd/system/
+cp docker-dcm4chee.service %{buildroot}/etc/systemd/system/
+cp docker-keycloak.service %{buildroot}/etc/systemd/system/
+cp docker-ldap.service %{buildroot}/etc/systemd/system/
+
+mkdir -p %{buildroot}/etc/dcm4chee
+cp dcm4chee.conf %{buildroot}/etc/dcm4chee/
+cp keycloak.conf %{buildroot}/etc/dcm4chee/
+cp ldap.conf %{buildroot}/etc/dcm4chee/
+
+mkdir -p %{buildroot}/storage
+
+mkdir -p %{buildroot}/docker/dcm4chee/ldap
+mkdir -p %{buildroot}/docker/dcm4chee/slapd.d
+mkdir -p %{buildroot}/docker/dcm4chee/keycloak
+mkdir -p %{buildroot}/docker/dcm4chee/wildfly
+
+mkdir -p %{buildroot}/usr/share/dcm4chee/psql
+cp sql/*.sql %{buildroot}/usr/share/dcm4chee/psql/
+
+%clean
+rm -rf %{buildroot}
+
+%files
+%defattr(-,root,root)
+/etc/systemd/system/docker-dcm4chee.service
+%config (noreplace) /etc/dcm4chee/dcm4chee.conf
+%attr(-, root, root) %dir /storage
+%attr(-, dcm4chee-arc, dcm4chee-arc) %dir /docker/dcm4chee/wildfly
+/usr/share/dcm4chee/psql
+
+
+%files ldap
+%defattr(-,root,root)
+/etc/systemd/system/docker-ldap.service
+%config (noreplace) /etc/dcm4chee/ldap.conf
+%attr(-, slapd-dcm4chee, slapd-dcm4chee) %dir /docker/dcm4chee/ldap
+%attr(-, slapd-dcm4chee, slapd-dcm4chee) %dir /docker/dcm4chee/slapd.d
+
+
+%files keycloak
+%defattr(-,root,root)
+/etc/systemd/system/docker-keycloak.service
+%config (noreplace) /etc/dcm4chee/keycloak.conf
+%attr(-, keycloak-dcm4chee, keycloak-dcm4chee) %dir /docker/dcm4chee/keycloak
+
+
+
+%changelog
+

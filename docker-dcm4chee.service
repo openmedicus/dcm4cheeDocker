@@ -1,11 +1,25 @@
 [Unit]
-Description=DCM4CHEE container
+Description=DCM4CHEE Container
 Requires=docker.service
 After=docker.service
 
 [Service]
 Restart=always
-ExecStart=/usr/bin/docker run --name=dcm4chee -p 8080:8080 -p 11112:11112 dcm4chee
+EnvironmentFile=/etc/dcm4chee/dcm4chee.conf
+ExecStart=/usr/bin/docker run --hostname=dcm4chee.%H --network=dcm4chee_default --name dcm4chee -e TZ=${TZ} -e LC_ALL=${LOCALE} -e LANG=${LANG} \
+	-p 8080:8080 \
+	-p 8443:8443 \
+	-p 9990:9990 \
+	-p 11112:11112 \
+	-p 2575:2575 \
+	-e POSTGRES_DB=${POSTGRES_DB} \
+	-e POSTGRES_USER=${POSTGRES_USER} \
+	-e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
+	-e WILDFLY_WAIT_FOR=ldap:389 \
+	-e AUTH_SERVER_URL=${AUTH_SERVER_URL} \
+	-v /etc/localtime:/etc/localtime:ro \
+	-v /docker/dcm4chee/wildfly:/opt/wildfly/standalone \
+	dcm4che/dcm4chee-arc-psql:@DOCKER_VERSION@
 ExecStop=/usr/bin/docker stop -t 2 dcm4chee
 ExecStopPost=/usr/bin/docker rm -f dcm4chee
 

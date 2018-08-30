@@ -1,0 +1,20 @@
+[Unit]
+Description=LDAP Container
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+EnvironmentFile=/etc/dcm4chee/ldap.conf
+ExecStart=/usr/bin/docker run --network=dcm4chee_default --name ldap -e TZ=${TZ} -e LC_ALL=${LOCALE} -e LANG=${LANG} \
+	-p 389:389 \
+	-v /etc/localtime:/etc/localtime:ro \
+	-v /docker/dcm4chee/ldap:/var/lib/ldap \
+	-v /docker/dcm4chee/slapd.d:/etc/ldap/slapd.d \
+	dcm4che/slapd-dcm4chee:@DOCKER_VERSION@
+ExecStop=/usr/bin/docker stop -t 2 ldap
+ExecStopPost=/usr/bin/docker rm -f ldap
+
+[Install]
+WantedBy=default.target
+
