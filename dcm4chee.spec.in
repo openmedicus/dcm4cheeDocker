@@ -57,9 +57,11 @@ chcon system_u:object_r:container_file_t:s0 /storage
 
 %post ldap
 /usr/bin/systemctl daemon-reload >/dev/null 2>&1 
+chcon -R system_u:object_r:container_file_t:s0 /docker/dcm4chee
 
 %post keycloak
 /usr/bin/systemctl daemon-reload >/dev/null 2>&1 
+chcon -R system_u:object_r:container_file_t:s0 /docker/dcm4chee
 
 
 %build

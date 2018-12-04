@@ -8,6 +8,7 @@ Restart=always
 EnvironmentFile=/etc/dcm4chee/ldap.conf
 ExecStart=/usr/bin/docker run --network=dcm4chee_default --name ldap -e TZ=${TZ} -e LC_ALL=${LOCALE} -e LANG=${LANG} \
 	-p 389:389 \
+	-e STORAGE_DIR=${STORAGE_FILE_DIRS} \
 	-v /etc/localtime:/etc/localtime:ro \
 	-v /docker/dcm4chee/ldap:/var/lib/ldap \
 	-v /docker/dcm4chee/slapd.d:/etc/ldap/slapd.d \

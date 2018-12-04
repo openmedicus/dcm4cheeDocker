@@ -1,10 +1,10 @@
-VERSION = 5.14.0
-RELEASE = 6
+VERSION = 5.15.0
+RELEASE = 9
 
-DCM4CHEE_VERSION = 5.14.0-secure
-DCM4CHE_VERSION = 5.14.0
-KEYCLOAK_VERSION = 4.3.0-14.0
-LDAP_VERSION = 2.4.44-14.0
+DCM4CHEE_VERSION = 5.15.0-secure
+DCM4CHE_VERSION = 5.15.0
+KEYCLOAK_VERSION = 4.5.0-15.0
+LDAP_VERSION = 2.4.44-15.0
 
 rpm: dcm4chee.spec.in docker-dcm4chee.service docker-keycloak.service docker-ldap.service keycloak.conf ldap.conf dcm4chee.conf
 	-rm -rf /tmp/dcm4chee-$(VERSION)
@@ -23,8 +23,8 @@ rpm: dcm4chee.spec.in docker-dcm4chee.service docker-keycloak.service docker-lda
 	cp ldap.conf /tmp/dcm4chee-$(VERSION)/
 	cp keycloak.conf /tmp/dcm4chee-$(VERSION)/
 	mkdir /tmp/dcm4chee-$(VERSION)/sql
-	cp dcm4chee-arc-light/dcm4chee-arc-entity/src/main/resources/sql/create-sqlserver.sql /tmp/dcm4chee-$(VERSION)/sql/create-psql.sql
-	cp dcm4chee-arc-light/dcm4chee-arc-entity/src/main/resources/sql/update-*-psql.sql /tmp/dcm4chee-$(VERSION)/sql/
+	cp postgres-dcm4chee/docker-entrypoint-initdb.d/10_create-psql.sql /tmp/dcm4chee-$(VERSION)/sql/create-psql.sql
+	cp postgres-dcm4chee/sql/update-*-psql.sql /tmp/dcm4chee-$(VERSION)/sql/
 	cp dcm4che.conf /tmp/dcm4chee-$(VERSION)/
 	mkdir /tmp/dcm4chee-$(VERSION)/bin
 	cp bin/* /tmp/dcm4chee-$(VERSION)/bin/
